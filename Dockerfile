@@ -12,7 +12,6 @@ WORKDIR /app
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
-COPY --chown=nextjs:nodejs node_modules ./node_modules
 COPY --chown=nextjs:nodejs public ./public
 COPY --chown=nextjs:nodejs .next/standalone ./
 COPY --chown=nextjs:nodejs .next/static ./.next/static
