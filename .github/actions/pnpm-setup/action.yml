@@ -1,0 +1,41 @@
+name: Pnpm Setup
+description: Ambiente base para aplicações com pnpm e node js
+
+inputs:
+  pnpm-version:
+    default: "8"
+    required: true
+    description: Define pnpm version
+  node-version:
+    default: "20"
+    required: true
+    description: Define a versão do Node
+  hasEnvSetup:
+    default: "false"
+    required: false
+    description: Define se tem o setup mjs
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+
+    - uses: pnpm/action-setup@v4
+      with:
+        version: ${{ inputs.pnpm-version }}
+        run_install: false
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: "pnpm"
+
+    - name: Setup .env
+      if: ${{ inputs.hasEnvSetup == 'true' }}
+      shell: bash
+      run: node setup.mjs
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile -r
