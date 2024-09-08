@@ -6,7 +6,8 @@
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
   "features": {
           "ghcr.io/r3dpoint/devcontainer-features/tailwindcss-standalone-cli:1": {}
-  }
+  },
+  "postCreateCommand": "npm install -g pnpm@v8 && pnpm install"
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   // "features": {},
