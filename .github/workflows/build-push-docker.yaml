@@ -1,5 +1,4 @@
-name: build-push-docker
-run-name: Build and Push LPs Image
+name: Build and Push Docker Image
 
 on:
   release:
@@ -10,11 +9,14 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-        # This step already checks out code
+        # This step already checks out code and install deps
       - name: Setup Node and pnpm
         uses: devhatt/workflows/.github/actions/pnpm-setup@main
         with:
           hasEnvSetup: "false"
+
+      - name: Build
+        run: pnpm build
 
       - name: Test Env
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
