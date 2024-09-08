@@ -40,7 +40,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.DEVHATT_LP_REGISTRY_REPOSITORY_NAME }}:latest
-
-
-    
+          tags: ${{ vars.DEVHATT_LP_REGISTRY_REPOSITORY_NAME }}:latest, ${{ vars.DEVHATT_LP_REGISTRY_REPOSITORY_NAME }}:${{ env.RELEASE_VERSION }}
