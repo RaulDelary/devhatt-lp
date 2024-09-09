@@ -37,10 +37,7 @@ jobs:
           push: true
           tags: ${{ vars.DEVHATT_LP_REGISTRY_REPOSITORY_NAME }}:latest, ${{ vars.DEVHATT_LP_REGISTRY_REPOSITORY_NAME }}:${{ env.RELEASE_VERSION }}
 
-      - name: checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Docker and Docker Compose on Remote
+      - name: Deploy to Server
         uses: cross-the-world/ssh-scp-ssh-pipelines@latest
         env:
           docker_hub_username: ${{ secrets.DEVHATT_LP_DOCKER_HUB_USER }}
@@ -57,7 +54,7 @@ jobs:
             'docker-compose.prod.yaml' => /devhatt/lading-pages/
 
           last_ssh: |
-            docker login -u $docker_username -p $docker_token
+            docker login -u $docker_hub_username -p $docker_hub_token
             cd /devhatt/lading-pages
             docker compose -p devhatt-lp -f docker-compose.prod.yaml up -d
             
