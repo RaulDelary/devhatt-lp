@@ -1,0 +1,60 @@
+name: Build, Push and Deploy Docker
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      # This step already checks out code and install deps
+      - name: Setup Node and pnpm
+        uses: devhatt/workflows/.github/actions/pnpm-setup@main
+        with:
+          hasEnvSetup: "false"
+
+      - name: Build
+        run: pnpm build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Login
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.DEVHATT_LP_DOCKER_HUB_USER }}
+          password: ${{ secrets.DEVHATT_LP_DOCKER_HUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ vars.DEVHATT_LP_REGISTRY_REPOSITORY_NAME }}:latest, ${{ vars.DEVHATT_LP_REGISTRY_REPOSITORY_NAME }}:${{ env.RELEASE_VERSION }}
+
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Docker and Docker Compose on Remote
+        uses: cross-the-world/ssh-scp-ssh-pipelines@latest
+        env:
+          docker_hub_username: ${{ secrets.DEVHATT_LP_DOCKER_HUB_USER }}
+          docker_hub_token: ${{ secrets.DEVHATT_LP_DOCKER_HUB_TOKEN }}
+        with:
+          host: ${{ vars.DEVHATT_LP_HOST_SERVER_PROD }}
+          port: 22
+          user: ${{ secrets.DEVHATT_LP_DEPLOY_USER }}
+          key: ${{ secrets.DEVHATT_LP_SERVER_KEY_PROD }}
+          first_ssh: |
+            if [[ ! -d /devhatt/lading-pages ]] then sudo mkdir -p /devhatt/lading-pages; sudo chown -R ec2-user:ec2-user /devhatt/lading-pages; fi;
+
+          scp: |
+            'docker-compose.prod.yaml' => /devhatt/lading-pages/
+
+          last_ssh: |
+            docker login -u $docker_username -p $docker_token
+            cd /devhatt/lading-pages
+            docker compose -p devhatt-lp -f docker-compose.prod.yaml up -d
+            
