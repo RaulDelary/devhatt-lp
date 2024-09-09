@@ -18,14 +18,6 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Test Env
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
-      - name: Test Env 2
-        run: |
-          echo $RELEASE_VERSION
-          echo ${{ env.RELEASE_VERSION }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
